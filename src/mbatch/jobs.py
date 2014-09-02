@@ -81,7 +81,7 @@ class JobsList(Resource):
         mimetype = args["job-bundle"].mimetype
         mimetype_params = args["job-bundle"].mimetype_params
         condor_job_id, job_desc = submit_job(job_uuid, job_work_dir, args["job-name"], job_bundle, job_bundle.filename, args["job-input"], args["job-notification"])
-        ret = { "job_id": str(job_uuid), "condor_id": condor_job_id }
+        ret = { "job_id": str(job_uuid), "backend_id": condor_job_id }
         ret.update(job_desc)
         return ret
 
