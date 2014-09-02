@@ -20,7 +20,7 @@ limitations under the License.
 '''
 
 
-from flask.ext.restful import Resource, reqparse, marshal_with, fields
+from flask.ext.restful import Resource, reqparse, marshal_with, fields, abort
 from werkzeug.datastructures import FileStorage
 
 import util
@@ -57,6 +57,8 @@ job_fields = {
     "job_priority": fields.Integer,
     "exit_by_signal": fields.Boolean,
     "local_user_cpu": fields.Float,
+    "exit_status": fields.Integer,
+    "job_completion_date": fields.Integer
 }
 
 class JobsList(Resource):
@@ -87,4 +89,9 @@ class Job(Resource):
 
     @marshal_with(job_fields)
     def get(self, job_id):
-        return get_job_info(job_id)
+        job_info = get_job_info(job_id)
+
+        if not job_info:
+            abort(404, message="Job {} doesn't exist".format(job_id))
+
+        return job_info

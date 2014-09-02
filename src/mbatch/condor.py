@@ -52,7 +52,10 @@ JOB_INFO_KEYS = {
     "JobStartDate": "job_start_date",
     "JobPrio": "job_priority",
     "ExitBySignal": "exit_by_signal",
-    "LocalUserCpu": "local_user_cpu"
+    "LocalUserCpu": "local_user_cpu",
+    "ExitStatus": "exit_status",
+    "CompletionDate": "job_completion_date",
+    "FixedJobStatus": "job_status"
 }
 
 
