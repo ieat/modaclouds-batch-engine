@@ -29,5 +29,5 @@ def main():
     app = Flask(__name__)
     api = Api(app)
     api.add_resource(JobsList, '/jobs')
-    api.add_resource(Job, '/jobs/<string:todo_id>')
+    api.add_resource(Job, '/jobs/<string:job_id>')
     app.run(debug=True)

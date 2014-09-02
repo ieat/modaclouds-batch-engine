@@ -20,22 +20,69 @@ limitations under the License.
 '''
 
 
-from flask.ext.restful import Resource, reqparse
+from flask.ext.restful import Resource, reqparse, marshal_with, fields
 from werkzeug.datastructures import FileStorage
 
+import util
+
+import tempfile
+import uuid
+import os
+
+from condor import submit_job, get_jobs, get_job_info
 
 jobs_parser = reqparse.RequestParser()
 jobs_parser.add_argument('job-name', type=str)
-jobs_parser.add_argument('job-bundle', type=FileStorage)
+jobs_parser.add_argument('job-bundle', type=FileStorage, required=True, help="File containing the tool")
+jobs_parser.add_argument('job-input', type=FileStorage)
+jobs_parser.add_argument('job-notification', type=str)
+
+
+work_dir = tempfile.mkdtemp(prefix="batch-engine", suffix="-work-dir")
+
+print dir(fields)
+job_fields = {
+    'previous_job_status': util.CondorJobStatusString,
+    'job_status': util.CondorJobStatusString,
+    'global_job_id': fields.String,
+    'cluster_id': fields.Integer,
+    'id': fields.String,
+    'job_run_count': fields.Integer,
+    "proc_id": fields.Integer,
+    "image_size": fields.Integer,
+    "job_universe": util.CondorUniverseStatusString,
+    "job_current_start_date": util.CondorTimeFromTimestamp,
+    "job_start_date": util.CondorTimeFromTimestamp,
+    "job_priority": fields.Integer,
+    "exit_by_signal": fields.Boolean,
+    "local_user_cpu": fields.Float,
+}
 
 class JobsList(Resource):
     def get(self):
-        return {}
+        jobs = [{'id': job.get('GridResource', None),
+                 'job_status': util.convert_status_code_to_string(job.get('JobStatus')),
+                 'cwd': job.get('Iwd')
+                } for job in get_jobs()]
+        return jobs
 
     def post(self):
-
         args = jobs_parser.parse_args()
-        return args
+        job_uuid = uuid.uuid4()
+        job_work_dir = os.path.join(work_dir, str(job_uuid))
+
+        job_bundle = args["job-bundle"]
+
+        fname = args["job-bundle"].filename
+        mimetype = args["job-bundle"].mimetype
+        mimetype_params = args["job-bundle"].mimetype_params
+        condor_job_id, job_desc = submit_job(job_uuid, job_work_dir, args["job-name"], job_bundle, job_bundle.filename, args["job-input"], args["job-notification"])
+        ret = { "job_id": str(job_uuid), "condor_id": condor_job_id }
+        ret.update(job_desc)
+        return ret
 
 class Job(Resource):
-    pass
+
+    @marshal_with(job_fields)
+    def get(self, job_id):
+        return get_job_info(job_id)

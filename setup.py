@@ -51,6 +51,7 @@ setup(
     entry_points={
         'console_scripts': [
             'batch-engine = mbatch.cli:main',
+            'batch-engine-wrapper = mbatch.wrapper:main'
         ]
     },
     install_requires=["flask>=0.10", "flask-restful"],
