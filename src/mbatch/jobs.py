@@ -43,7 +43,8 @@ work_dir = tempfile.mkdtemp(prefix="batch-engine", suffix="-work-dir")
 print dir(fields)
 job_fields = {
     'previous_job_status': util.CondorJobStatusString,
-    'job_status': util.CondorJobStatusString,
+    'backend_job_status': util.CondorJobStatusString,
+    "job_status": util.CondorJobStatusString,
     'global_job_id': fields.String,
     'cluster_id': fields.Integer,
     'id': fields.String,
@@ -61,7 +62,8 @@ job_fields = {
 class JobsList(Resource):
     def get(self):
         jobs = [{'id': job.get('GridResource', None),
-                 'job_status': util.convert_status_code_to_string(job.get('JobStatus')),
+                 'backend_job_status': util.convert_status_code_to_string(job.get('JobStatus')),
+                 'job_status': util.convert_status_code_to_string(job.get('FixedJobStatus')),
                  'cwd': job.get('Iwd')
                 } for job in get_jobs()]
         return jobs

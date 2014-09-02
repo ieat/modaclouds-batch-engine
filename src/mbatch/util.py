@@ -55,6 +55,19 @@ def convert_status_code_to_string(code):
 def convert_universe_code_to_string(code):
     return JOB_UNIVERSE_CODES.get(int(code), "__unknown__")
 
+def get_efectiv_job_status(backend_status, hold_on_exit, hold_code, hold_subcode):
+    """Returns the efective status in case hold_on_exit is enabled.
+
+    """
+
+    if backend_status != 5:
+        return backend_status
+    if hold_on_exit != "TRUE":
+        return backend_status
+    if hold_code == 5 and hold_subcode == 0: # If held due to undefined OnExitHold evaluation
+        return 4 # Return completed
+    return backend_status
+
 class CondorTimeFromClassAd(fields.DateTime):
     def format(self, value):
         dt = datetime.datetime.fromtimestamp(value.eval())

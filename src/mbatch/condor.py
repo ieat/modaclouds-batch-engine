@@ -25,6 +25,7 @@ import classad
 import pipes
 import codecs
 import pkg_resources
+from util import get_efectiv_job_status
 
 USERLOG_FILE_NAME="user.log"
 ERRLOG_FILE_NAME="err.log"
@@ -39,7 +40,7 @@ WRAPPER_SCRIPT=pkg_resources.resource_filename(__name__, "resources/wrapper.py")
 JOB_INFO_KEYS = {
     "CurrentTime": "current_time",
     "LastJobStatus":"previous_job_status",
-    "JobStatus": "job_status",
+    "JobStatus": "backend_job_status",
     "GlobalJobId": "global_job_id",
     "ClusterId": "cluster_id",
     "GridResource": "id",
@@ -58,7 +59,10 @@ JOB_INFO_KEYS = {
 def get_jobs():
     schedd = htcondor.Schedd()
     jobs = schedd.query()
-    return jobs
+    for job in jobs:
+        job["FixedJobStatus"] = get_efectiv_job_status(job["JobStatus"], job["OnExitHold"], job["HoldReasonCode"], job["HoldReasonSubCode"])
+        yield job
+
 
 def get_job_info(job_uuid):
     ret = {}
@@ -121,7 +125,8 @@ def submit_job(job_uuid, job_work_dir, job_name, job_bundle, job_bundle_name, jo
         "Arguments": job_arguments,
         "UserLog": user_log,
         "Err": err_log,
-        "Out": out_log
+        "Out": out_log,
+        "OnExitHold": "TRUE"
     }
     job_ad = classad.ClassAd(job_desc)
     condor_job_id = schedd.submit(job_ad)
