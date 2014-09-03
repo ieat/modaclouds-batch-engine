@@ -49,11 +49,15 @@ JOB_UNIVERSE_CODES = {
     12: "local",
     13: "__max__"
 }
+
+
 def convert_status_code_to_string(code):
     return JOB_CODES.get(int(code), "__unknown__")
 
+
 def convert_universe_code_to_string(code):
     return JOB_UNIVERSE_CODES.get(int(code), "__unknown__")
+
 
 def get_efectiv_job_status(backend_status, hold_on_exit, hold_code, hold_subcode):
     """Returns the efective status in case hold_on_exit is enabled.
@@ -68,19 +72,23 @@ def get_efectiv_job_status(backend_status, hold_on_exit, hold_code, hold_subcode
         return 4 # Return completed
     return backend_status
 
+
 class CondorTimeFromClassAd(fields.DateTime):
     def format(self, value):
         dt = datetime.datetime.fromtimestamp(value.eval())
         return fields.DateTime.format(self, dt)
+
 
 class CondorTimeFromTimestamp(fields.DateTime):
     def format(self, value):
         dt = datetime.datetime.fromtimestamp(value)
         return fields.DateTime.format(self, dt)
 
+
 class CondorJobStatusString(fields.String):
     def format(self, value):
         return convert_status_code_to_string(value)
+
 
 class CondorUniverseStatusString(fields.String):
     def format(self, value):

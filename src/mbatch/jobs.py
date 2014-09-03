@@ -19,7 +19,6 @@ limitations under the License.
 @copyright: 2014 Institute eAustria
 '''
 
-
 from flask.ext.restful import Resource, reqparse, marshal_with, fields, abort
 from werkzeug.datastructures import FileStorage
 
@@ -36,7 +35,6 @@ jobs_parser.add_argument('job-name', type=str)
 jobs_parser.add_argument('job-bundle', type=FileStorage, required=True, help="File containing the tool")
 jobs_parser.add_argument('job-input', type=FileStorage)
 jobs_parser.add_argument('job-notification', type=str)
-
 
 work_dir = tempfile.mkdtemp(prefix="batch-engine", suffix="-work-dir")
 
@@ -60,6 +58,7 @@ job_fields = {
     "job_completion_date": fields.Integer
 }
 
+
 class JobsList(Resource):
     def get(self):
         jobs = [{'id': job.get('GridResource', None),
@@ -79,13 +78,14 @@ class JobsList(Resource):
         fname = args["job-bundle"].filename
         mimetype = args["job-bundle"].mimetype
         mimetype_params = args["job-bundle"].mimetype_params
-        condor_job_id, job_desc = submit_job(job_uuid, job_work_dir, args["job-name"], job_bundle, job_bundle.filename, args["job-input"], args["job-notification"])
-        ret = { "job_id": str(job_uuid), "backend_id": condor_job_id }
+        condor_job_id, job_desc = submit_job(job_uuid, job_work_dir, args["job-name"], job_bundle, job_bundle.filename,
+                                             args["job-input"], args["job-notification"])
+        ret = {"job_id": str(job_uuid), "backend_id": condor_job_id}
         ret.update(job_desc)
         return ret
 
-class Job(Resource):
 
+class Job(Resource):
     @marshal_with(job_fields)
     def get(self, job_id):
         job_info = get_job_info(job_id)
