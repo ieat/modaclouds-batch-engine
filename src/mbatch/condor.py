@@ -94,6 +94,10 @@ def hold_job(job_uuid):
     schedd = htcondor.Schedd()
     schedd.act(htcondor.JobAction.Hold, 'GridResource=="%s"' % str(job_uuid))
 
+def continue_job(job_uuid):
+    schedd = htcondor.Schedd()
+    schedd.act(htcondor.JobAction.Hold, 'GridResource=="%s"' % str(job_uuid))
+
 
 def submit_job(job_uuid, job_work_dir, job_name, job_bundle, job_bundle_name, job_input, job_notification):
     schedd = htcondor.Schedd()
