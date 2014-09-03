@@ -23,7 +23,7 @@ import sys
 
 from flask import Flask
 from flask.ext.restful import Api
-from jobs import JobsList, Job, JobController
+from jobs import JobsList, Job, JobController, JobArtifacts
 
 def main():
     app = Flask(__name__)
@@ -31,4 +31,5 @@ def main():
     api.add_resource(JobsList, '/jobs')
     api.add_resource(Job, '/jobs/<string:job_id>',)
     api.add_resource(JobController, '/jobs/<string:job_id>/<string:action>')
+    api.add_resource(JobArtifacts, '/jobs/<string:job_id>/artifacts/<string:artifact_name>')
     app.run(debug=True)

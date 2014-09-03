@@ -112,3 +112,8 @@ class JobController(Resource):
         else:
             abort(400, message="Action {} is not known".format(action))
         return {'result': [job_id, action]}
+
+
+class JobArtifacts(Resource):
+    def get(self, job_id, artifact_name):
+        pass
