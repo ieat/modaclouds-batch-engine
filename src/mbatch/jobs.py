@@ -95,3 +95,17 @@ class Job(Resource):
             abort(404, message="Job {} doesn't exist".format(job_id))
 
         return job_info
+
+
+class JobController(Resource):
+    def get(self, job_id, action):
+        job_info = get_job_info(job_id)
+
+        if not job_info:
+            abort(404, message="Job {} doesn't exist".format(job_id))
+
+        if action == "remove":
+            remove_job(job_id)
+        else:
+            abort(400, message="Action {} is not known".format(action))
+        return {'result': [job_id, action]}

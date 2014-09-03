@@ -78,7 +78,15 @@ def get_job_info(job_uuid):
     for key in job.keys():
         if key in JOB_INFO_KEYS:
             ret[JOB_INFO_KEYS[key]] = job[key]
+
+    #print job
     return ret
+
+
+def remove_job(job_uuid):
+    schedd = htcondor.Schedd()
+    schedd.act(htcondor.JobAction.Remove, 'GridResource=="%s"' % str(job_uuid))
+
 
 def submit_job(job_uuid, job_work_dir, job_name, job_bundle, job_bundle_name, job_input, job_notification):
     schedd = htcondor.Schedd()
