@@ -28,7 +28,7 @@ import tempfile
 import uuid
 import os
 
-from mbatch.condor import submit_job, get_jobs, get_job_info, remove_job
+from mbatch.condor import submit_job, get_jobs, get_job_info, remove_job, hold_job
 
 jobs_parser = reqparse.RequestParser()
 jobs_parser.add_argument('job-name', type=str)
@@ -105,6 +105,8 @@ class JobController(Resource):
 
         if action == "remove":
             remove_job(job_id)
+        elif action == "hold":
+            hold_job(job_id)
         else:
             abort(400, message="Action {} is not known".format(action))
         return {'result': [job_id, action]}
