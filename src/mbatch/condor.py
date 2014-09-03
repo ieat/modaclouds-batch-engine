@@ -74,6 +74,7 @@ def get_job_info(job_uuid):
     if not jobs:
         return None
     job = jobs[0]
+    job["FixedJobStatus"] = get_efectiv_job_status(job["JobStatus"], job["OnExitHold"], job["HoldReasonCode"], job["HoldReasonSubCode"])
     for key in job.keys():
         if key in JOB_INFO_KEYS:
             ret[JOB_INFO_KEYS[key]] = job[key]
