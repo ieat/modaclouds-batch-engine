@@ -39,9 +39,9 @@ setup(
     keywords="batch",
     url="http://www.modaclouds.eu/",
     package_dir={'': srcdir},
-    #package_data={'': ['data/*.yaml']},
+    #package_data={'': ['resources/*.yaml']},
     packages=["mbatch", ],
-    long_description=read('README.rst'),
+    long_description=read('README.md'),
     classifiers=[
         "Intended Audience :: Developers",
         "Development Status :: 3 - Alpha",

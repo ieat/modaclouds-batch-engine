@@ -80,8 +80,6 @@ def get_job_info(job_uuid):
     for key in job.keys():
         if key in JOB_INFO_KEYS:
             ret[JOB_INFO_KEYS[key]] = job[key]
-
-    #print job
     return ret
 
 
