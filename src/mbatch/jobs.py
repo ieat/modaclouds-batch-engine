@@ -29,7 +29,7 @@ import tempfile
 import uuid
 import os
 
-from condor import submit_job, get_jobs, get_job_info
+from mbatch.condor import submit_job, get_jobs, get_job_info, remove_job
 
 jobs_parser = reqparse.RequestParser()
 jobs_parser.add_argument('job-name', type=str)
@@ -40,7 +40,6 @@ jobs_parser.add_argument('job-notification', type=str)
 
 work_dir = tempfile.mkdtemp(prefix="batch-engine", suffix="-work-dir")
 
-print dir(fields)
 job_fields = {
     'previous_job_status': util.CondorJobStatusString,
     'backend_job_status': util.CondorJobStatusString,
