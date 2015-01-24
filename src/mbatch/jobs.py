@@ -19,8 +19,10 @@ limitations under the License.
 @copyright: 2014 Institute eAustria
 '''
 
-from flask.ext.restful import Resource, reqparse, marshal_with, fields, abort
+from flask.ext.restful import Resource, Api, reqparse, marshal_with, fields, abort
 from werkzeug.datastructures import FileStorage
+from flask_restful_swagger import swagger
+from flask import Flask
 
 import util
 
@@ -58,9 +60,39 @@ job_fields = {
     "job_completion_date": fields.Integer
 }
 
+@swagger.model
+class JobAttributes:
+    resource_fields = job_fields
+
+
+def get_app():
+    app = Flask(__name__)
+    #api = Api(app)
+    api = swagger.docs(Api(app), apiVersion='0.1')
+    api.add_resource(JobsList, '/jobs')
+    api.add_resource(Job, '/jobs/<string:job_id>',)
+    api.add_resource(JobController, '/jobs/<string:job_id>/<string:action>')
+    api.add_resource(JobArtifacts, '/jobs/<string:job_id>/artifacts/<string:artifact_name>')
+
+    return app,api
 
 class JobsList(Resource):
+    """ Job List
+    """
+    @swagger.operation(
+        notes='List Jobs',
+        nickname='get',
+        parameters=[],
+        responseMessages=[
+            {
+                "code": 200,
+                "message": "Success. Listed all jobs"
+            }
+        ]
+    )
     def get(self):
+        """Enumerate all tracked jobs
+        """
         jobs = [{'id': job.get('GridResource', None),
                  'backend_job_status': util.convert_status_code_to_string(job.get('JobStatus')),
                  'job_status': util.convert_status_code_to_string(job.get('FixedJobStatus')),
@@ -68,7 +100,49 @@ class JobsList(Resource):
                 } for job in get_jobs()]
         return jobs
 
+
+    @swagger.operation(
+        notes='Create a new Job',
+        nickname='post',
+        parameters=[
+            {
+                "name": "job-name",
+                "description": "The name of the job",
+                "required": True,
+                "allowMultiple": False,
+                "dataType": "string",
+            },
+            {
+                "name": "job-bundle",
+                "description": "Bundle containing the job",
+                "required": True,
+                "allowMultiple": False,
+                "dataType": "file",
+                "paramType": "body"
+            },
+            {
+                "name": "job-input",
+                "description": "An archive (tgz) containing the files needed by the application",
+                "required": True,
+                "allowMultiple": False,
+                "dataType": "file",
+                "paramType": "body"
+            },
+            {
+                "name": "job-notification",
+                "description": "An url that should be triggered (using POST) after the job completes",
+                "required": False,
+                "allowMultiple": False,
+                "dataType": "string",
+            }
+        ],
+        responseMessages = [
+
+        ]
+    )
     def post(self):
+        """Submit a new job
+        """
         args = jobs_parser.parse_args()
         job_uuid = uuid.uuid4()
         job_work_dir = os.path.join(work_dir, str(job_uuid))
@@ -86,8 +160,24 @@ class JobsList(Resource):
 
 
 class Job(Resource):
+    @swagger.operation(
+        notes='Obtain job information',
+        nickname='get',
+        responseClass="JobAttributes",
+        multiValuedResponse=True,
+        parameters=[
+        ],
+        responseMessages=[
+            {
+                "code": 200,
+                "message": "Success."
+            }
+        ]
+    )
     @marshal_with(job_fields)
     def get(self, job_id):
+        """Retrieve job state information
+        """
         job_info = get_job_info(job_id)
 
         if not job_info:
@@ -95,9 +185,58 @@ class Job(Resource):
 
         return job_info
 
+    @swagger.operation(
+        notes='Delete Job',
+        nickname='delete',
+        multiValuedResponse=False,
+        parameters=[
+            {
+                "name": "job_id",
+                "description": "The id of the job to delete",
+                "required": True,
+                "allowMultiple": False,
+                "paramType": "path",
+                "dataType": "string",
+            }
+        ],
+        responseMessages=[
+            {
+                "code": 200,
+                "message": "Success."
+            }
+        ]
+    )
+    def delete(self, job_id):
+        """
+        Cancel a Job
+        """
+        job_info = get_job_info(job_id)
+
 
 class JobController(Resource):
-    def get(self, job_id, action):
+    @swagger.operation(
+        notes='Job Operations',
+        nickname='put',
+        parameters=[
+            {
+                "name": "job_id",
+                "description": "The id of the job we operate on",
+                "required": True,
+                "allowMultiple": False,
+                "dataType": "string",
+                "paramType": "body"
+            }
+        ],
+        responseMessages=[
+            {
+                "code": 200,
+                "message": "Operation successful"
+            }
+        ]
+    )
+    def put(self, job_id, action):
+        """Change the state of a job
+        """
         job_info = get_job_info(job_id)
 
         if not job_info:

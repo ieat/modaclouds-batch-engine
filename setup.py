@@ -54,5 +54,5 @@ setup(
             'batch-engine-wrapper = mbatch.wrapper:main'
         ]
     },
-    install_requires=["flask>=0.10", "flask-restful"],
+    install_requires=["flask>=0.10", "flask-restful", "flask-restful-swagger"],
 )
