@@ -34,7 +34,7 @@ from mbatch.condor import submit_job, get_jobs, get_job_info, remove_job, hold_j
 
 jobs_parser = reqparse.RequestParser()
 jobs_parser.add_argument('job-name', type=str)
-jobs_parser.add_argument('job-bundle', type=FileStorage, required=True, help="File containing the tool")
+jobs_parser.add_argument('job-bundle', type=FileStorage, required=True, help="File containing the tool", location='files')
 jobs_parser.add_argument('job-input', type=FileStorage)
 jobs_parser.add_argument('job-notification', type=str)
 
@@ -118,7 +118,7 @@ class JobsList(Resource):
                 "required": True,
                 "allowMultiple": False,
                 "dataType": "file",
-                "paramType": "body"
+                #"paramType": "body"
             },
             {
                 "name": "job-input",
@@ -126,7 +126,7 @@ class JobsList(Resource):
                 "required": True,
                 "allowMultiple": False,
                 "dataType": "file",
-                "paramType": "body"
+                #"paramType": "body"
             },
             {
                 "name": "job-notification",
@@ -143,6 +143,7 @@ class JobsList(Resource):
     def post(self):
         """Submit a new job
         """
+        print jobs_parser
         args = jobs_parser.parse_args()
         job_uuid = uuid.uuid4()
         job_work_dir = os.path.join(work_dir, str(job_uuid))
