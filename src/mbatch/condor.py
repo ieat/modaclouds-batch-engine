@@ -136,11 +136,13 @@ def submit_job(job_uuid, job_work_dir, job_name, job_bundle, job_bundle_name, jo
     if job_input:
         job_arguments += "--job-input=%(job_input)s" % {'job_input': pipes.quote(input_file_name)}
 
+    print job_arguments
+
     job_desc = {
         "GridResource": "%s" % job_uuid,
         "Iwd": job_work_dir,
         "Cmd": "%s" % WRAPPER_SCRIPT,
-        "Arguments": job_arguments,
+        "Arguments": str(job_arguments),
         "UserLog": user_log,
         "Err": err_log,
         "Out": out_log,
