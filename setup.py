@@ -40,7 +40,7 @@ setup(
     url="http://www.modaclouds.eu/",
     package_dir={'': srcdir},
     #package_data={'': ['resources/*.yaml']},
-    packages=["mbatch", ],
+    packages=["mbatch", "mbatch.resources"],
     long_description=read('README.md'),
     classifiers=[
         "Intended Audience :: Developers",
@@ -51,7 +51,7 @@ setup(
     entry_points={
         'console_scripts': [
             'batch-engine = mbatch.cli:main',
-            'batch-engine-wrapper = mbatch.wrapper:main'
+            'batch-engine-wrapper = mbatch.resources.wrapper:main'
         ]
     },
     install_requires=["flask>=0.10", "flask-restful", "flask-restful-swagger"],

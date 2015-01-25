@@ -6,7 +6,6 @@ import subprocess
 import tarfile
 import argparse
 
-
 def main():
     parser = argparse.ArgumentParser(description='Wrap a user task')
     parser.add_argument("--job-bundle", required=True, type=argparse.FileType("r"), help="The bundle containing the program")
