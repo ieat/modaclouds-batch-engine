@@ -12,6 +12,9 @@ It will ultimately consist from two main API's:
  
 The queue management API is built on top of the [HTCondor](http://research.cs.wisc.edu/htcondor/) project.
 
+## Swagger UI
+The Batch Engine exposes an Swagger based UI. For accessing it connect to http://127.0.0.1:5000/api/spec.html#!/spec/post
+Replace 127.0.0.1 with the corresponding IP address.
 
 ## Queue Management
 ### Job Submision
@@ -105,7 +108,7 @@ Response:
 
 Fields of interest from the above output are:
 
- - `exit_status`: Represents the exit status of the user supplied application. It is independed of this middleware
+ - `exit_status`: Represents the exit status of the user supplied application. It is independent of this middleware
  - `job_completion_date`: The date when the job was completed. Please note that this field is affected by a know bug, always returning a constant value.
  - `job_start_date`: The date when the job was initially started. The correct start date of the current run might be different.
  - `job_status`: the current status of the job. Might be:
@@ -155,5 +158,8 @@ The `artifact` placeholder represents valid artifacts that can be requested from
  - `stderr`: a file containing the error output of the application
  - `_userlog`: a file containing the scheduling information. This artifact might be removed in any of the following versions. Do not use.
 
+# Bundle Specification
 
+Currently the bundle is expected to be an gzip compressed tar file (.tar.gz) containing at least an executable file named `run.sh`
+in the root of the archive. Besides `run.sh` the archive can contain any other files.
 
