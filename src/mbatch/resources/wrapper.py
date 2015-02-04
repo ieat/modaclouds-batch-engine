@@ -51,7 +51,6 @@ def main():
             f.close()
         except:
             traceback.print_exc(file=sys.stderr)
-        print args.notification_url
     sys.exit(child.returncode)
 
 
