@@ -105,13 +105,17 @@ def get_artifact(job_work_dir, job_uuid, artifact):
     job_scratch_dir = os.path.join(job_work_dir, SCRATCH_DIR)
     if artifact == "output":
         arcname = "%s.%s.tar" % (job_uuid, artifact)
+        arcname = os.path.join(job_scratch_dir, arcname)
         tar = tarfile.open(arcname, "w:gz")
         tar.add(job_output_dir)
-        return "output"
+        tar.close()
+        return open(arcname, "r").read()
     elif artifact == "stdout":
-        return "stdout"
+        out_log = os.path.join(job_work_dir, OUT_FILE_NAME)
+        return open(out_log, "r").read()
     elif artifact == "stderr":
-        return "stderr"
+        err_log = os.path.join(job_work_dir, ERRLOG_FILE_NAME)
+        return open(err_log, "r").read()
     else:
         raise
 
