@@ -5,7 +5,8 @@ import sys
 import subprocess
 import tarfile
 import argparse
-import pipes
+import json
+import urllib2
 
 def main():
     parser = argparse.ArgumentParser(description='Wrap a user task')
@@ -14,8 +15,11 @@ def main():
     parser.add_argument("--job-output", required=True, type=str, help="Path to the output directory")
     parser.add_argument("--job-scratch", required=True, type=str, help="Path to the scratch directory")
     parser.add_argument("--job-arguments", required=True, type=str, help="Job arguments")
-
+    parser.add_argument("--job-uuid", required=True, type=str, help="Job UUID")
+    parser.add_argument("--notification-url", required=False, type=str, help="Notification URL")
     args = parser.parse_args()
+
+    job_info = {'job-uuid': args.job_uuid}
     expand_dir = "%s.exploded" % args.job_bundle.name
     tar = tarfile.open(fileobj=args.job_bundle)
     print >>sys.stderr, "extracting bundle to: %s" % expand_dir
@@ -25,8 +29,6 @@ def main():
     if not os.path.exists(bundle_entry_point):
         print >>sys.stderr, "Invalid bundle! Missing entrypoint"
         sys.exit(1)
-
-
 
     child_environment = os.environ.copy()
     if args.job_input:
@@ -38,9 +40,19 @@ def main():
         command_args += " %s" % (args.job_arguments, )
     child = subprocess.Popen(command_args, shell=True, env=child_environment)
     child.wait()
+    if args.notification_url:
+        import traceback
+        job_info["retcode"] = child.returncode
+        payload = json.dumps(job_info)
+        try:
+            req = urllib2.Request(args.notification_url, payload, {'Content-Type': 'application/json'})
+            f = urllib2.urlopen(req)
+            f.read()
+            f.close()
+        except:
+            traceback.print_exc(file=sys.stderr)
+        print args.notification_url
     sys.exit(child.returncode)
-
-
 
 
 if __name__ == "__main__":

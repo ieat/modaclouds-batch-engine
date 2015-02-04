@@ -147,14 +147,19 @@ def submit_job(job_uuid, job_work_dir, job_name, job_bundle, job_bundle_name, jo
     else:
         job_bundle.save(bundle_file_name)
 
-    job_arguments = "--job-bundle=%(job_bundle)s --job-output=%(job_output)s --job-scratch=%(job_scratch)s" % {
+    job_arguments = "--job-bundle=%(job_bundle)s --job-output=%(job_output)s --job-scratch=%(job_scratch)s " % {
         'job_bundle': pipes.quote(bundle_file_name),
         'job_output': pipes.quote(job_output_dir),
         'job_scratch': pipes.quote(job_scratch_dir)
     }
 
+    job_arguments += " --job-uuid=%s " % job_uuid
+
+    if job_notification:
+        job_arguments += " --notification-url=%(notification_url)s" % {'notification_url': pipes.quote(job_notification)}
+
     if job_input:
-        job_arguments += "--job-input=%(job_input)s" % {'job_input': pipes.quote(input_file_name)}
+        job_arguments += " --job-input=%(job_input)s" % {'job_input': pipes.quote(input_file_name)}
 
     if user_job_arguments:
         job_arguments += " --job-arguments=\"%(job_arguments)s\"" % {'job_arguments': pipes.quote(user_job_arguments)}
