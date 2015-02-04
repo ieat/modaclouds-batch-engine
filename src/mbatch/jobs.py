@@ -22,7 +22,7 @@ limitations under the License.
 from flask.ext.restful import Resource, Api, reqparse, marshal_with, fields, abort
 from werkzeug.datastructures import FileStorage
 from flask_restful_swagger import swagger
-from flask import Flask
+from flask import Flask, make_response
 
 import util
 
@@ -30,10 +30,11 @@ import tempfile
 import uuid
 import os
 
-from mbatch.condor import submit_job, get_jobs, get_job_info, remove_job, hold_job, continue_job
+from mbatch.condor import submit_job, get_jobs, get_job_info, remove_job, hold_job, continue_job, get_artifact
 
 jobs_parser = reqparse.RequestParser()
-jobs_parser.add_argument('job-name', type=str)
+jobs_parser.add_argument('job-name', type=str, required=True)
+jobs_parser.add_argument('job-arguments', type=str, required=True)
 jobs_parser.add_argument('job-bundle', type=FileStorage, required=True, help="File containing the tool", location='files')
 jobs_parser.add_argument('job-input', type=FileStorage)
 jobs_parser.add_argument('job-notification', type=str)
@@ -121,6 +122,13 @@ class JobsList(Resource):
                 #"paramType": "body"
             },
             {
+                "name": "job-arguments",
+                "description": "The arguments of the job",
+                "required": False,
+                "allowMultiple": False,
+                "dataType": "string",
+            },
+            {
                 "name": "job-input",
                 "description": "An archive (tgz) containing the files needed by the application",
                 "required": True,
@@ -154,7 +162,8 @@ class JobsList(Resource):
         mimetype = args["job-bundle"].mimetype
         mimetype_params = args["job-bundle"].mimetype_params
         condor_job_id, job_desc = submit_job(job_uuid, job_work_dir, args["job-name"], job_bundle, job_bundle.filename,
-                                             args["job-input"], args["job-notification"])
+                                             args["job-input"], args["job-notification"], args["job-arguments"])
+        print args
         ret = {"job_id": str(job_uuid), "backend_id": condor_job_id}
         ret.update(job_desc)
         return ret
@@ -256,4 +265,5 @@ class JobController(Resource):
 
 class JobArtifacts(Resource):
     def get(self, job_id, artifact_name):
-        pass
+        job_work_dir = os.path.join(work_dir, str(job_id))
+        return make_response(get_artifact(job_work_dir, job_id, artifact_name))

@@ -26,6 +26,8 @@ import pipes
 import codecs
 import pkg_resources
 from util import get_efectiv_job_status
+import tarfile
+import shlex
 
 USERLOG_FILE_NAME = "user.log"
 ERRLOG_FILE_NAME = "err.log"
@@ -96,8 +98,26 @@ def continue_job(job_uuid):
     schedd = htcondor.Schedd()
     schedd.act(htcondor.JobAction.Hold, 'GridResource=="%s"' % str(job_uuid))
 
+def get_artifact(job_work_dir, job_uuid, artifact):
+    job_input_dir = os.path.join(job_work_dir, INPUT_BASEDIR_NAME)
+    job_output_dir = os.path.join(job_work_dir, OUTPUT_DIR)
+    job_bundle_dir = os.path.join(job_work_dir, BUNDLE_DIR)
+    job_scratch_dir = os.path.join(job_work_dir, SCRATCH_DIR)
+    if artifact == "output":
+        arcname = "%s.%s.tar" % (job_uuid, artifact)
+        tar = tarfile.open(arcname, "w:gz")
+        tar.add(job_output_dir)
+        return "output"
+    elif artifact == "stdout":
+        return "stdout"
+    elif artifact == "stderr":
+        return "stderr"
+    else:
+        raise
 
-def submit_job(job_uuid, job_work_dir, job_name, job_bundle, job_bundle_name, job_input, job_notification):
+
+
+def submit_job(job_uuid, job_work_dir, job_name, job_bundle, job_bundle_name, job_input, job_notification, user_job_arguments):
     schedd = htcondor.Schedd()
     job_input_dir = os.path.join(job_work_dir, INPUT_BASEDIR_NAME)
     job_output_dir = os.path.join(job_work_dir, OUTPUT_DIR)
@@ -135,6 +155,10 @@ def submit_job(job_uuid, job_work_dir, job_name, job_bundle, job_bundle_name, jo
 
     if job_input:
         job_arguments += "--job-input=%(job_input)s" % {'job_input': pipes.quote(input_file_name)}
+
+    if user_job_arguments:
+        job_arguments += " --job-arguments=\"%(job_arguments)s\"" % {'job_arguments': pipes.quote(user_job_arguments)}
+
 
     print job_arguments
 
