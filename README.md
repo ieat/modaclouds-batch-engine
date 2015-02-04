@@ -29,7 +29,11 @@ For job submission you need to access the `jobs` endpoint using POST and provide
  
 Invocation:
 
-```curl -v --data-urlencode 'job-bundle@setup.py' -X POST http://localhost:5000/jobs```
+    curl -v -F 'job-bundle=@job.tar.gz' \ # What file to upload
+         -F 'job-name=test1' \ # Job Name
+         -F 'job-arguments=-foo' \ # Arguments to pass to the application
+         -F 'job-notification=http://localhost:5000/' \ # Where to send an completion notification
+         -X POST http://localhost:5000/jobs
 
 Result:
 
@@ -38,6 +42,8 @@ Result:
 		"backend_id": 124
 	}
 
+The above example uploads the file `job.tar.gz` and it executes the contained application (using the contained `run.sh` script).
+The call to the `run.sh` provides also the command line arguments specified in `job-arguments` (in the above case `-foo`)
 
 The result contains bot an UUID identifying the job and the backend id for the job (for condor this would mean the `cluster_id`)
 
@@ -156,7 +162,6 @@ The `artifact` placeholder represents valid artifacts that can be requested from
  - `output`: an archive containing the output directory
  - `stdout`: a file containing the standard output of the application
  - `stderr`: a file containing the error output of the application
- - `_userlog`: a file containing the scheduling information. This artifact might be removed in any of the following versions. Do not use.
 
 # Bundle Specification
 
