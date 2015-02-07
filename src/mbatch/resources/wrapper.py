@@ -49,8 +49,9 @@ def main():
             f = urllib2.urlopen(req)
             f.read()
             f.close()
-        except:
-            traceback.print_exc(file=sys.stderr)
+        except Exception, e:
+            print >>sys.stderr, "Failed to perform the HTTP call to: %s The error was: %s" % (args.notification_url,
+                                                                                              str(e))
     sys.exit(child.returncode)
 
 
