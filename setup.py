@@ -31,7 +31,7 @@ def read(fname):
 srcdir = 'src'
 setup(
     name="batch-engine",
-    version="0.0.1",
+    version="0.1.0",
     author="Marian Neagul",
     author_email="marian@ieat.ro",
     description="Tool for handling batch schedulling software",
