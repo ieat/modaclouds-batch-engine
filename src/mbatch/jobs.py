@@ -112,6 +112,7 @@ class JobsList(Resource):
                 "required": True,
                 "allowMultiple": False,
                 "dataType": "string",
+                "paramType": "form",
             },
             {
                 "name": "job-bundle",
@@ -119,7 +120,7 @@ class JobsList(Resource):
                 "required": True,
                 "allowMultiple": False,
                 "dataType": "file",
-                #"paramType": "body"
+                "paramType": "form",
             },
             {
                 "name": "job-arguments",
@@ -127,6 +128,7 @@ class JobsList(Resource):
                 "required": False,
                 "allowMultiple": False,
                 "dataType": "string",
+                "paramType": "form",
             },
             {
                 "name": "job-input",
@@ -134,7 +136,7 @@ class JobsList(Resource):
                 "required": True,
                 "allowMultiple": False,
                 "dataType": "file",
-                #"paramType": "body"
+                "paramType": "form",
             },
             {
                 "name": "job-notification",
@@ -142,6 +144,7 @@ class JobsList(Resource):
                 "required": False,
                 "allowMultiple": False,
                 "dataType": "string",
+                "paramType": "form",
             }
         ],
         responseMessages = [
