@@ -39,7 +39,7 @@ def main():
     if args.job_arguments:
         command_args += " %s" % (args.job_arguments, )
 
-    os.chdir(os.path.join(args.job_output, ".."))
+    os.chdir(expand_dir)
     child = subprocess.Popen(command_args, shell=True, env=child_environment)
     child.wait()
     if args.notification_url:
