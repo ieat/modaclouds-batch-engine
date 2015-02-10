@@ -221,6 +221,9 @@ class Job(Resource):
         Cancel a Job
         """
         job_info = get_job_info(job_id)
+        if not job_info:
+            abort(404, message="Job {} doesn't exist".format(job_id))
+        remove_job(job_id)
 
 
 class JobController(Resource):
