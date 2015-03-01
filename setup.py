@@ -38,6 +38,7 @@ setup(
     license="APL",
     keywords="batch",
     url="http://www.modaclouds.eu/",
+    zip_safe=False,
     package_dir={'': srcdir},
     #package_data={'': ['resources/*.yaml']},
     packages=["mbatch", "mbatch.resources"],
