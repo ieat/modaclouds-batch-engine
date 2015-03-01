@@ -127,7 +127,8 @@ def submit_job(job_uuid, job_work_dir, job_name, job_bundle, job_bundle_name, jo
     job_output_dir = os.path.join(job_work_dir, OUTPUT_DIR)
     job_bundle_dir = os.path.join(job_work_dir, BUNDLE_DIR)
     job_scratch_dir = os.path.join(job_work_dir, SCRATCH_DIR)
-    os.makedirs(job_work_dir)
+    if not os.path.exists(job_work_dir):
+        os.makedirs(job_work_dir)
     os.makedirs(job_input_dir)
     os.makedirs(job_output_dir)
     os.makedirs(job_bundle_dir)
