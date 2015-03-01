@@ -9,6 +9,7 @@ import json
 import urllib2
 
 def main():
+    print >>sys.stderr, "Running as: %s:%s" % (os.getuid(), os.getgid())
     parser = argparse.ArgumentParser(description='Wrap a user task')
     parser.add_argument("--job-bundle", required=True, type=argparse.FileType("r"), help="The bundle containing the program")
     parser.add_argument("--job-input", required=False, default=None, type=argparse.FileType("r"), help="The input that should be sent to the program")
